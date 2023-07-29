@@ -11,10 +11,15 @@ const adjectives = [
   const nouns = ["unicorn", "dragon", "wizard", "moon", "star", "garden"];
   
   const generateUsername = () => {
-    const randomAdjective =
-      adjectives[Math.floor(Math.random() * adjectives.length)];
+    const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-    return `${randomAdjective}_${randomNoun}`;
+    const randomNumber = Math.floor(Math.random() * 10000); // Change the range as needed
+  
+    // Convert the first letter of the adjective and noun to uppercase
+    const camelCaseAdjective = randomAdjective.charAt(0).toUpperCase() + randomAdjective.slice(1);
+    const camelCaseNoun = randomNoun.charAt(0).toUpperCase() + randomNoun.slice(1);
+  
+    return `${camelCaseAdjective}${camelCaseNoun}${randomNumber}`;
   };
   
   export const register = async (req, res) => {
