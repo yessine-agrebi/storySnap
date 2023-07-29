@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import User from '../models/user.model.js';
+import jwt from 'jsonwebtoken'
 const adjectives = [
     "happy",
     "brilliant",
@@ -53,3 +54,31 @@ const adjectives = [
     }
   };
   
+
+export const login = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+  
+      // Find the user by email
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({ message: 'Email not found.' });
+      }
+  
+      // Compare the provided password with the hashed password in the database
+      const passwordMatch = await bcrypt.compare(password, user.password);
+  
+      if (!passwordMatch) {
+        return res.status(401).json({ message: 'Incorrect password.' });
+      }
+  
+      // Generate a JWT token for authentication
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+  
+      res.json({ token, username: user.username });
+    } catch (error) {
+      console.error('Error logging in:', error);
+      res.status(500).json({ message: 'An error occurred during login.' });
+    }
+  }
