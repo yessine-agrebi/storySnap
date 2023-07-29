@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import EventEmitter from "events";
 import authRouter from "./routes/auth.routes.js";
+import storyRouter from "./routes/story.routes.js";
 dotenv.config();
 
 const app = express();
@@ -41,6 +42,7 @@ export const emitEvent = (eventName, data) => {
 };
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/story", storyRouter);
 
 server.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

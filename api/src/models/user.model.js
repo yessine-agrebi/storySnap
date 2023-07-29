@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  country: {
+    type: String,
+    default: Tunisia
+  }
 });
 
 const User = mongoose.model("User", userSchema);
