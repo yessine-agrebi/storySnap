@@ -1,5 +1,6 @@
-import { register } from "../services/auth.service.js";
+import { login, register } from "../services/auth.service.js";
 
 export const authController = {
-    register: register
+    register: register,
+    login: login
 }
