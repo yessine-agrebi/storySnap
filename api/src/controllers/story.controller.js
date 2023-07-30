@@ -15,7 +15,7 @@ const createNewStory = async (req, res) => {
 
     // Create the story in the database
     const newStory = await createStory({ content, userId });
-
+    emitEvent('newStory', newStory)
     res.status(201).json(newStory);
   } catch (error) {
     res.status(500).json({ error: error.message });

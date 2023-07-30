@@ -40,6 +40,12 @@ io.on("connection", (socket) => {
     socket.emit("notification", notification);
   });
 
+  socket.on("newStory", (story) => {
+    console.log("New story received:", story);
+    // Send the notification to the connected client
+    socket.emit("story", story);
+  });
+
   socket.on("disconnect", () => {
     clearInterval(interval);
     console.log("Client disconnected");
