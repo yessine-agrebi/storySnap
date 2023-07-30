@@ -33,6 +33,12 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("A new client connected");
+  socket.on("newNotification", (notification) => {
+    console.log("New notification received:", notification);
+    // Send the notification to the connected client
+    socket.emit("notification", notification);
+  });
+
   socket.on("disconnect", () => {
     clearInterval(interval);
     console.log("Client disconnected");
@@ -42,7 +48,7 @@ io.on("connection", (socket) => {
 export const emitEvent = (eventName, data) => {
   io.emit(eventName, data);
 };
-app.use(authenticateUser)
+app.use(authenticateUser);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/story", storyRouter);
 app.use("/api/v1/user", userRouter);
@@ -51,4 +57,4 @@ server.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
 
-export default app
+export default app;

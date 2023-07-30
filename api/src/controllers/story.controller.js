@@ -1,5 +1,6 @@
 import Story from "../models/story.model.js";
 import User from "../models/user.model.js";
+import { emitEvent } from "../server.js";
 import {
   createStory,
   getAllStories,
@@ -7,7 +8,6 @@ import {
   updateStoryById,
   deleteStoryById,
 } from "../services/story.service.js";
-
 // Controller function to handle creating a new story
 const createNewStory = async (req, res) => {
   try {
@@ -120,7 +120,15 @@ const voteOnStoryController = async (req, res) => {
 
     story.votes.push(userId);
     await story.save();
+    const notification = new Notification({
+      recipientId: story.userId,
+      type: 'vote',
+      content: `New vote on your story"`,
+    });
+    await notification.save();
 
+    // Emit a real-time event to notify the story owner
+    emitEvent('newNotification', notification)
     res.status(200).json({ message: "Voted successfully." });
   } catch (error) {
     res.status(500).json({ error: "Failed to vote on the story." });
@@ -150,6 +158,15 @@ const leaveCommentOnStoryController = async (req, res) => {
     story.comments.push(comment);
     await story.save();
     const result = { ...comment, username: user.username };
+    const notification = new Notification({
+      recipientId: story.userId,
+      type: 'vote',
+      content: `New comment on your story"`,
+    });
+    await notification.save();
+
+    // Emit a real-time event to notify the story owner
+    emitEvent('newNotification', notification)
     res.status(200).json({ message: "Comment added successfully.", result });
   } catch (error) {
     res.status(500).json({ error: "Failed to add comment to the story." });
