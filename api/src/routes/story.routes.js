@@ -10,6 +10,7 @@ import {
   updateCommentController,
   deleteCommentController,
 } from "../controllers/story.controller.js";
+import { authorize } from "../middlewares/authorize.js";
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ const router = express.Router();
 router.post("/", createNewStory);
 
 // Route for fetching all stories
-router.get("/", getAllStoriesController);
+router.get("/", authorize(["user"]), getAllStoriesController);
 
 // Route for fetching a single story by its ID
 router.get("/:storyId", getStoryByIdController);

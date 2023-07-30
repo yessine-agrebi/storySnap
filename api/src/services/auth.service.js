@@ -74,7 +74,8 @@ export const login = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ message: "Incorrect password." });
     }
-
+    req.user = { userId: user._id.toString(), role: user.role }
+    console.log(req.user);
     // Generate a JWT token for authentication
     const token = jwt.sign(
       { userId: user._id, role: user.role }, // Include the role in the JWT payload

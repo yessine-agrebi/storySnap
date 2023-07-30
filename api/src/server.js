@@ -9,6 +9,7 @@ import EventEmitter from "events";
 import authRouter from "./routes/auth.routes.js";
 import storyRouter from "./routes/story.routes.js";
 import userRouter from "./routes/user.routes.js";
+import { authenticateUser } from "./middlewares/auth.middleware.js";
 dotenv.config();
 
 const app = express();
@@ -41,7 +42,7 @@ io.on("connection", (socket) => {
 export const emitEvent = (eventName, data) => {
   io.emit(eventName, data);
 };
-
+app.use(authenticateUser)
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/story", storyRouter);
 app.use("/api/v1/user", userRouter);

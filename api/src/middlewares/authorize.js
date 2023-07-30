@@ -1,5 +1,6 @@
 // middleware/authorize.js
 export const authorize = (roles) => (req, res, next) => {
+    console.log(req.user);
     const { role } = req.user;
   
     if (!roles.includes(role)) {
