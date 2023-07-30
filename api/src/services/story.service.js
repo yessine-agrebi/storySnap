@@ -13,10 +13,10 @@ const createStory = async (storyData) => {
 // Function to get all stories
 const getAllStories = async () => {
   try {
-    const allStories = await Story.find().populate("userId", "username", "country");
+    const allStories = await Story.find().populate("userId", "username country");
     return allStories;
   } catch (error) {
-    throw new Error("Failed to fetch stories.");
+    throw new Error(error.message)
   }
 };
 

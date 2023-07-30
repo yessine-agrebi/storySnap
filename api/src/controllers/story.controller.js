@@ -10,7 +10,7 @@ const createNewStory = async (req, res) => {
 
     res.status(201).json(newStory);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create story." });
+    res.status(500).json({ error: error.message });
   }
 };
 
