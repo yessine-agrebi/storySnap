@@ -18,7 +18,12 @@ const userSchema = new mongoose.Schema({
   country: {
     type: String,
     default: "Tunisia"
-  }
+  },
+  role: {
+    type: String,
+    enum: ["admin", "user"],
+    default: "user",
+  },
 });
 
 const User = mongoose.model("User", userSchema);
