@@ -1,4 +1,5 @@
 import Story from "../models/story.model.js";
+import User from "../models/user.model.js";
 import {
   createStory,
   getAllStories,
@@ -114,6 +115,35 @@ const voteOnStoryController = async (req, res) => {
   }
 };
 
+const leaveCommentOnStoryController = async (req, res) => {
+  try {
+    const { userId, content } = req.body;
+    const { storyId } = req.params;
+
+    const story = await Story.findById(storyId);
+    if (!story) {
+      return res.status(404).json({ error: "Story not found." });
+    }
+
+    // Find the user by userId to get the username
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const comment = {
+      userId,
+      content,
+    };
+    story.comments.push(comment);
+    await story.save();
+    const result = { ...comment, username: user.username };
+    res.status(200).json({ message: "Comment added successfully.", result });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add comment to the story." });
+  }
+};
+
 export {
   createNewStory,
   getAllStoriesController,
@@ -121,4 +151,5 @@ export {
   updateStoryByIdController,
   deleteStoryByIdController,
   voteOnStoryController,
+  leaveCommentOnStoryController,
 };
