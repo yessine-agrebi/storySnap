@@ -16,15 +16,26 @@ const createNewStory = async (req, res) => {
 
 // Controller function to handle fetching all stories
 const getAllStoriesController = async (req, res) => {
-  try {
-    // Get all stories from the database
-    const allStories = await getAllStories();
-
-    res.status(200).json(allStories);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch stories." });
-  }
-};
+    try {
+      const { page, limit } = req.query;
+      const parsedPage = parseInt(page) || 1;
+      const parsedLimit = parseInt(limit) || 10;
+  
+      const { totalStories, stories } = await getAllStories(parsedPage, parsedLimit);
+  
+      const totalPages = Math.ceil(totalStories / parsedLimit);
+  
+      res.status(200).json({
+        page: parsedPage,
+        totalPages,
+        totalStories,
+        stories,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch stories." });
+    }
+  };
+  
 
 // Controller function to handle fetching a single story by its ID
 const getStoryByIdController = async (req, res) => {

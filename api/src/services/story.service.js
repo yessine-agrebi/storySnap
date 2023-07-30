@@ -11,14 +11,17 @@ const createStory = async (storyData) => {
 };
 
 // Function to get all stories
-const getAllStories = async () => {
-  try {
-    const allStories = await Story.find().populate("userId", "username country");
-    return allStories;
-  } catch (error) {
-    throw new Error(error.message)
-  }
-};
+const getAllStories = async (page = 1, limit = 10) => {
+    try {
+      const skip = (page - 1) * limit;
+      const totalStories = await Story.countDocuments();
+      const allStories = await Story.find().skip(skip).limit(limit).populate("userId", "username country");
+      return { totalStories, stories: allStories };
+    } catch (error) {
+      throw new Error("Failed to fetch stories.");
+    }
+  };
+  
 
 // Function to get a single story by its ID
 const getStoryById = async (storyId) => {
