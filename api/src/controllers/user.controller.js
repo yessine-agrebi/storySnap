@@ -55,4 +55,4 @@ const deleteUserByIdController = async (req, res) => {
   }
 };
 
-export { createNewUser, getAllUsersController, getUserByIdController, updateUserByIdController, deleteUserByIdController };
+export { getAllUsersController, getUserByIdController, updateUserByIdController, deleteUserByIdController };

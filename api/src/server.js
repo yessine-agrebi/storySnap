@@ -8,6 +8,7 @@ import { createServer } from "http";
 import EventEmitter from "events";
 import authRouter from "./routes/auth.routes.js";
 import storyRouter from "./routes/story.routes.js";
+import userRouter from "./routes/user.routes.js";
 dotenv.config();
 
 const app = express();
@@ -43,6 +44,7 @@ export const emitEvent = (eventName, data) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/story", storyRouter);
+app.use("/api/v1/user", userRouter);
 
 server.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
