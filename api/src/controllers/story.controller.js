@@ -1,4 +1,11 @@
-import { createStory, getAllStories, getStoryById, updateStoryById, deleteStoryById } from "../services/story.service.js";
+import Story from "../models/story.model.js";
+import {
+  createStory,
+  getAllStories,
+  getStoryById,
+  updateStoryById,
+  deleteStoryById,
+} from "../services/story.service.js";
 
 // Controller function to handle creating a new story
 const createNewStory = async (req, res) => {
@@ -16,26 +23,28 @@ const createNewStory = async (req, res) => {
 
 // Controller function to handle fetching all stories
 const getAllStoriesController = async (req, res) => {
-    try {
-      const { page, limit } = req.query;
-      const parsedPage = parseInt(page) || 1;
-      const parsedLimit = parseInt(limit) || 10;
-  
-      const { totalStories, stories } = await getAllStories(parsedPage, parsedLimit);
-  
-      const totalPages = Math.ceil(totalStories / parsedLimit);
-  
-      res.status(200).json({
-        page: parsedPage,
-        totalPages,
-        totalStories,
-        stories,
-      });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch stories." });
-    }
-  };
-  
+  try {
+    const { page, limit } = req.query;
+    const parsedPage = parseInt(page) || 1;
+    const parsedLimit = parseInt(limit) || 10;
+
+    const { totalStories, stories } = await getAllStories(
+      parsedPage,
+      parsedLimit
+    );
+
+    const totalPages = Math.ceil(totalStories / parsedLimit);
+
+    res.status(200).json({
+      page: parsedPage,
+      totalPages,
+      totalStories,
+      stories,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch stories." });
+  }
+};
 
 // Controller function to handle fetching a single story by its ID
 const getStoryByIdController = async (req, res) => {
@@ -80,4 +89,36 @@ const deleteStoryByIdController = async (req, res) => {
   }
 };
 
-export { createNewStory, getAllStoriesController, getStoryByIdController, updateStoryByIdController, deleteStoryByIdController };
+const voteOnStoryController = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const { storyId } = req.params;
+
+    const story = await Story.findById(storyId);
+    if (!story) {
+      return res.status(404).json({ error: "Story not found." });
+    }
+
+    if (story.votes.includes(userId)) {
+      return res
+        .status(400)
+        .json({ error: "You have already voted on this story." });
+    }
+
+    story.votes.push(userId);
+    await story.save();
+
+    res.status(200).json({ message: "Voted successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to vote on the story." });
+  }
+};
+
+export {
+  createNewStory,
+  getAllStoriesController,
+  getStoryByIdController,
+  updateStoryByIdController,
+  deleteStoryByIdController,
+  voteOnStoryController,
+};

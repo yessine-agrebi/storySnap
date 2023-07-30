@@ -5,6 +5,7 @@ import {
   getStoryByIdController,
   updateStoryByIdController,
   deleteStoryByIdController,
+  voteOnStoryController,
 } from "../controllers/story.controller.js";
 
 const router = express.Router();
@@ -23,5 +24,7 @@ router.put("/:storyId", updateStoryByIdController);
 
 // Route for deleting a story by its ID
 router.delete("/:storyId", deleteStoryByIdController);
+
+router.post("/:storyId/vote", voteOnStoryController);
 
 export default router;
