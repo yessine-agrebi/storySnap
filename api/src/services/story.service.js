@@ -35,10 +35,8 @@ const getAllStories = async (page = 1, limit = 10, sortQuery, userCountryFilter)
       .skip(skip)
       .limit(limit)
       .exec();
-
     // Filter out users whose country does not match the filter
     const filteredStories = allStories.filter(story => story.userId);
-
     return { totalStories, stories: filteredStories };
   } catch (error) {
     throw new Error("Failed to fetch stories.");

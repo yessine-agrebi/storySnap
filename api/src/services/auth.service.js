@@ -82,3 +82,115 @@ export const login = async (req, res) => {
       res.status(500).json({ message: 'An error occurred during login.' });
     }
   }
+
+  // auth.service.js
+
+export const requestPasswordReset = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if the email is registered
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Email not found." });
+    }
+
+    // Generate a unique password reset token
+    const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Set the expiration time for the token
+    });
+
+    // Save the reset token and its expiration time to the user's record in the database
+    user.passwordResetToken = resetToken;
+    user.passwordResetExpires = Date.now() + 3600000; // 1 hour from now
+    await user.save();
+
+    // Send the password reset link to the user's email
+    // Implement your email sending logic here
+
+    res.json({ message: "Password reset link sent to your email." });
+  } catch (error) {
+    console.error("Error requesting password reset:", error);
+    res.status(500).json({ message: "An error occurred while processing your request." });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Find the user with the given reset token
+    const user = await User.findOne({
+      passwordResetToken: token,
+      passwordResetExpires: { $gt: Date.now() }, // Check if the token is not expired
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token." });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    res.json({ message: "Password reset successful." });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ message: "An error occurred while processing your request." });
+  }
+};
+
+
+export const requestEmailVerification = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if the email is registered
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Email not found." });
+    }
+
+    // Generate a unique email verification token
+    const verificationToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d", // Set the expiration time for the token (e.g., 1 day)
+    });
+
+    // Save the verification token to the user's record in the database
+    user.emailVerificationToken = verificationToken;
+    await user.save();
+
+    // Send the email verification link to the user's email
+    // Implement your email sending logic here
+
+    res.json({ message: "Email verification link sent to your email." });
+  } catch (error) {
+    console.error("Error requesting email verification:", error);
+    res.status(500).json({ message: "An error occurred while processing your request." });
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    // Find the user with the given verification token
+    const user = await User.findOne({ emailVerificationToken: token });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token." });
+    }
+
+    // Mark the user's email as verified in the database
+    user.emailVerificationToken = undefined;
+    await user.save();
+
+    res.json({ message: "Email verified successfully." });
+  } catch (error) {
+    console.error("Error verifying email:", error);
+    res.status(500).json({ message: "An error occurred while processing your request." });
+  }
+};
