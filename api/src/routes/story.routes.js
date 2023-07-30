@@ -7,6 +7,8 @@ import {
   deleteStoryByIdController,
   voteOnStoryController,
   leaveCommentOnStoryController,
+  updateCommentController,
+  deleteCommentController,
 } from "../controllers/story.controller.js";
 
 const router = express.Router();
@@ -29,5 +31,10 @@ router.delete("/:storyId", deleteStoryByIdController);
 router.post("/:storyId/vote", voteOnStoryController);
 
 router.post("/:storyId/comment", leaveCommentOnStoryController);
+
+// Route for updating a comment
+router.put("/:storyId/comment/:commentId", updateCommentController);
+
+router.delete("/:storyId/comment/:commentId", deleteCommentController);
 
 export default router;

@@ -144,6 +144,65 @@ const leaveCommentOnStoryController = async (req, res) => {
   }
 };
 
+const updateCommentController = async (req, res) => {
+    try {
+      const { userId, content } = req.body;
+      const { storyId, commentId } = req.params;
+  
+      const story = await Story.findById(storyId);
+      if (!story) {
+        return res.status(404).json({ error: "Story not found." });
+      }
+  
+      const comment = story.comments.id(commentId);
+      if (!comment) {
+        return res.status(404).json({ error: "Comment not found." });
+      }
+  
+      // Check if the user is the creator of the comment
+      if (comment.userId.toString() !== userId) {
+        return res.status(403).json({ error: "You are not authorized to update this comment." });
+      }
+  
+      comment.content = content;
+      await story.save();
+  
+      res.status(200).json({ message: "Comment updated successfully.", comment });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update the comment." });
+    }
+  };
+
+  const deleteCommentController = async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const { storyId, commentId } = req.params;
+  
+      const story = await Story.findById(storyId);
+      if (!story) {
+        return res.status(404).json({ error: "Story not found." });
+      }
+  
+      const comment = story.comments.id(commentId);
+      if (!comment) {
+        return res.status(404).json({ error: "Comment not found." });
+      }
+  
+      // Check if the user is the creator of the comment
+      if (comment.userId.toString() !== userId) {
+        return res.status(403).json({ error: "You are not authorized to delete this comment." });
+      }
+  
+      comment.remove();
+      await story.save();
+  
+      res.status(200).json({ message: "Comment deleted successfully." });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete the comment." });
+    }
+  };
+  
+  
 export {
   createNewStory,
   getAllStoriesController,
@@ -152,4 +211,6 @@ export {
   deleteStoryByIdController,
   voteOnStoryController,
   leaveCommentOnStoryController,
+  updateCommentController,
+  deleteCommentController
 };
