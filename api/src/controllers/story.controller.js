@@ -25,13 +25,25 @@ const createNewStory = async (req, res) => {
 // Controller function to handle fetching all stories
 const getAllStoriesController = async (req, res) => {
   try {
-    const { page, limit } = req.query;
+    const { page, limit, sortBy, sortOrder, country } = req.query;
     const parsedPage = parseInt(page) || 1;
     const parsedLimit = parseInt(limit) || 10;
 
+    let sortQuery = {};
+    if (sortBy && sortOrder) {
+      sortQuery[sortBy] = sortOrder === "desc" ? -1 : 1;
+    }
+
+    let userCountryFilter;
+    if (country) {
+      userCountryFilter = country;
+    }
+
     const { totalStories, stories } = await getAllStories(
       parsedPage,
-      parsedLimit
+      parsedLimit,
+      sortQuery,
+      userCountryFilter
     );
 
     const totalPages = Math.ceil(totalStories / parsedLimit);

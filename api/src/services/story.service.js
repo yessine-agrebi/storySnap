@@ -11,17 +11,40 @@ const createStory = async (storyData) => {
 };
 
 // Function to get all stories
-const getAllStories = async (page = 1, limit = 10) => {
-    try {
-      const skip = (page - 1) * limit;
-      const totalStories = await Story.countDocuments();
-      const allStories = await Story.find().skip(skip).limit(limit).populate("userId", "username country");
-      return { totalStories, stories: allStories };
-    } catch (error) {
-      throw new Error("Failed to fetch stories.");
+const getAllStories = async (page = 1, limit = 10, sortQuery, userCountryFilter) => {
+  try {
+    const skip = (page - 1) * limit;
+    let query = Story.find();
+
+    if (userCountryFilter) {
+      query = query.populate({
+        path: 'userId',
+        select: 'username country',
+        match: { country: userCountryFilter }
+      });
+    } else {
+      query = query.populate('userId', 'username country');
     }
-  };
-  
+
+    if (sortQuery) {
+      query = query.sort(sortQuery);
+    }
+
+    const totalStories = await Story.countDocuments();
+    const allStories = await query
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    // Filter out users whose country does not match the filter
+    const filteredStories = allStories.filter(story => story.userId);
+
+    return { totalStories, stories: filteredStories };
+  } catch (error) {
+    throw new Error("Failed to fetch stories.");
+  }
+};
+
 
 // Function to get a single story by its ID
 const getStoryById = async (storyId) => {
@@ -36,11 +59,9 @@ const getStoryById = async (storyId) => {
 // Function to update a story by its ID
 const updateStoryById = async (storyId, updatedData) => {
   try {
-    const updatedStory = await Story.findByIdAndUpdate(
-      storyId,
-      updatedData,
-      { new: true }
-    );
+    const updatedStory = await Story.findByIdAndUpdate(storyId, updatedData, {
+      new: true,
+    });
     return updatedStory;
   } catch (error) {
     throw new Error("Failed to update story.");
@@ -56,4 +77,10 @@ const deleteStoryById = async (storyId) => {
   }
 };
 
-export { createStory, getAllStories, getStoryById, updateStoryById, deleteStoryById };
+export {
+  createStory,
+  getAllStories,
+  getStoryById,
+  updateStoryById,
+  deleteStoryById,
+};
