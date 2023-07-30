@@ -9,6 +9,7 @@ import EventEmitter from "events";
 import authRouter from "./routes/auth.routes.js";
 import storyRouter from "./routes/story.routes.js";
 import userRouter from "./routes/user.routes.js";
+import notificationRouter from "./routes/notification.routes.js";
 import { authenticateUser } from "./middlewares/auth.middleware.js";
 dotenv.config();
 
@@ -52,6 +53,7 @@ app.use(authenticateUser);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/story", storyRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 server.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
